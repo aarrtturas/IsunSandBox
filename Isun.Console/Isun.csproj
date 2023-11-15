@@ -25,10 +25,6 @@
   </ItemGroup>
   
   <ItemGroup>
-    <None Include="..\.editorconfig" Link=".editorconfig" />
-  </ItemGroup>
-  
-  <ItemGroup>
     <ProjectReference Include="..\Isun.AppContext\Isun.ApplicationContext.csproj" />
     <ProjectReference Include="..\Isun.Domain\Isun.Domain.csproj" />
     <ProjectReference Include="..\Isun.Services\Isun.Services.csproj" />
@@ -46,6 +42,12 @@
     <None Update="appsettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="App_Data\Readme.md">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="App_Data\" />
   </ItemGroup>
 
 </Project>

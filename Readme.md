@@ -1,14 +1,13 @@
-# Password can't be uplaoded to GitHub you will need to provide it as a parameter
+# How it works
+
+Password can't be uplaoded to GitHub you will need to provide it as a parameter
+
+Usage:
+isun.exe -p "password" -c "city1,city2,city3"
 
 
-Isun.exe -p "password" -c "city1,city2,city3"
-
-
+Some settings:
 ```json
-Isun.exe -p "password" -c "city1,city2.city3"
-Isun.exe --help
-
-
 {
   "WeatherApi": {
     "BaseUrl": "https://weather-api.isun.ch/",
@@ -18,4 +17,4 @@ Isun.exe --help
 }
 ```
 
-# App initial structure is build with expansion in mind
+App initial structure is build with expansion in mind
