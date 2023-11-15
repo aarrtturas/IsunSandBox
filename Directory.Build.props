@@ -1,0 +1,48 @@
+<Project>
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <LangVersion>11.0</LangVersion>
+    <AspNetCoreVersion>7.0.5</AspNetCoreVersion>
+    <MicrosoftExtensions>7.0.0</MicrosoftExtensions>
+    <MicrosoftAspNetCoreHosting>2.2.7</MicrosoftAspNetCoreHosting>
+
+    <AspNetCoreHttp>2.2.2</AspNetCoreHttp>
+    
+    <AccelerateBuildsInVisualStudio>true</AccelerateBuildsInVisualStudio>
+
+    <!--Project version to show in app-->
+    <ProjectVersion>0.0.1</ProjectVersion>
+
+    <ExtensionsConfiguration>7.0.0</ExtensionsConfiguration>
+    <ExtensionsLogging>7.0.0</ExtensionsLogging>
+    
+    <ExtensionsHosting>7.0.1</ExtensionsHosting>
+    <NetHttpJson>7.0.1</NetHttpJson>
+
+    <Mapster>7.4.0</Mapster>
+    <MapsterDependencyInjection>1.0.1</MapsterDependencyInjection>
+    
+    <Polly>7.2.3</Polly>
+
+    <MicrosoftLogging>7.0.0</MicrosoftLogging>
+    <SerilogAspNetCore>6.1.0</SerilogAspNetCore>
+    <SerilogExpressions>3.4.0</SerilogExpressions>
+    <SerilogSinksSeq>5.2.2</SerilogSinksSeq>
+    <SerilogSinksApplicationInsights>4.0.0</SerilogSinksApplicationInsights>
+    <SerilogExpressions>3.4.1</SerilogExpressions>
+
+    <FluentValidation>11.5.2</FluentValidation>
+    <FluentValidationAspNetCore>11.3.0</FluentValidationAspNetCore>
+
+    <ExtensionsHttpPolly>6.0.9</ExtensionsHttpPolly>
+    <NDeskOptionsCore>1.2.5</NDeskOptionsCore>
+    <CoverletCollector>3.2.0</CoverletCollector>
+    <NetTestSdk>17.3.2</NetTestSdk>
+    <Xunit>2.4.2</Xunit>
+    <XunitRunner>2.4.5</XunitRunner>
+    <Moq>4.18.4</Moq>
+    <MemoryCacheTestingMoq>1.2.2</MemoryCacheTestingMoq>
+    <MockQueryableMoq>7.0.0</MockQueryableMoq>
+
+  </PropertyGroup>
+</Project>

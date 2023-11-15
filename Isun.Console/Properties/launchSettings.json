@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Isun": {
+      "commandName": "Project",
+      "commandLineArgs": "-p passwrod -c \"Vilnius, Kaunas\""
+    }
+  }
+}
