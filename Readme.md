@@ -2,8 +2,8 @@
 
 Password can't be uplaoded to GitHub you will need to provide it as a parameter
 
-Usage:
-isun.exe -p "password" -c "city1,city2,city3"
+Usage. City - from Capital letter:
+isun.exe -p "password" -c "City1,City2,City3"
 
 
 Some settings:
