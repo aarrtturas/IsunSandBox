@@ -22,7 +22,7 @@
     <Mapster>7.4.0</Mapster>
     <MapsterDependencyInjection>1.0.1</MapsterDependencyInjection>
     
-    <Polly>7.2.3</Polly>
+    <Polly>8.2.0</Polly>
 
     <MicrosoftLogging>7.0.0</MicrosoftLogging>
     <SerilogAspNetCore>6.1.0</SerilogAspNetCore>

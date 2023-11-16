@@ -3,6 +3,7 @@ using Isun.Domain.Dao;
 using Isun.Domain.Validators;
 using Isun.Domain.View;
 using Isun.Services;
+using Isun.Shared;
 using Moq;
 using Xunit;
 
@@ -19,11 +20,13 @@ public class CitiesWeatherHostedServiceTest : BaseTests
     {
         // Arrange
         this.CitiesWeatherServiceMock.Setup(service => service.GetWeather(It.IsAny<string>())).ReturnsAsync(new CityWeatherView());
+        this.ConfigurationMock.Setup(s => s["WeatherApi:DelayInSeconds"]).Returns("15");
         var classUnderTest = new CitiesWeatherHostedService(AuthenticationServiceMock.Object,
                                                             CitiesWeatherServiceMock.Object,
                                                             ValidatorMock.Object,
                                                             ConfigurationMock.Object,
                                                             ContextMock.Object);
+
         this.ConfigurationMock.Setup(s => s[It.IsAny<string>()]).Returns("username");
         ContextMock.Setup(s => s.AddRange(It.IsAny<List<CityWeatherDao>>()));
         classUnderTest.InitTest(new List<string>() { "Vilnius", "Kaunas" });
@@ -43,6 +46,7 @@ public class CitiesWeatherHostedServiceTest : BaseTests
     {
         // Arrange
         this.CitiesWeatherServiceMock.Setup(service => service.GetWeather(It.IsAny<string>())).ReturnsAsync((CityWeatherView?)null);
+        this.ConfigurationMock.Setup(s => s["WeatherApi:DelayInSeconds"]).Returns("15");
         var classUnderTest = new CitiesWeatherHostedService(AuthenticationServiceMock.Object,
                                                             CitiesWeatherServiceMock.Object,
                                                             ValidatorMock.Object,

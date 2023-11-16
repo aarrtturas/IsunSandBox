@@ -4,6 +4,7 @@ using Isun.Domain.Dao;
 using Isun.Domain.Projections;
 using Isun.Domain.Validators;
 using Isun.Services;
+using Isun.Shared;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Serilog;

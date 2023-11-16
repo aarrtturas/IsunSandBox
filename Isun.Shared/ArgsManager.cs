@@ -1,9 +1,9 @@
-﻿public class ArgsManager
+﻿namespace Isun.Shared;
+public class ArgsManager
 {
 #pragma warning disable CS8618
     private static ArgsManager _instance;
 
-    // These fields should be encrypted or stored securely if used for sensitive information
     private string cities;
     private string password;
 

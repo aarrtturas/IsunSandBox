@@ -20,6 +20,7 @@ public abstract class BaseTests : IDisposable
 
         this.ConfigurationMock = new Mock<IConfiguration>();
         this.ConfigurationMock.Setup(s => s[It.IsAny<string>()]).Returns("value");
+        this.ConfigurationMock.Setup(s => s[It.IsAny<string>()]).Returns("value");
         this.configurationRootMock = new Mock<IConfigurationRoot>();
         this.configurationRootMock.Setup(s => s.GetSection(It.IsAny<string>()).Value).Returns("value");
 

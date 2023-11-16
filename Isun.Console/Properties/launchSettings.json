@@ -2,7 +2,7 @@
   "profiles": {
     "Isun": {
       "commandName": "Project",
-      "commandLineArgs": "-p passwrod -c \"Vilnius, Kaunas\""
+      "commandLineArgs": "-p passwrod -c \"Vilnius, Kaunas, Joniškis, Klaipėda\""
     }
   }
 }
