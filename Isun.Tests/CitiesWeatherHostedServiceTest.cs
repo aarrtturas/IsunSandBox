@@ -21,7 +21,8 @@ public class CitiesWeatherHostedServiceTest : BaseTests
         // Arrange
         this.CitiesWeatherServiceMock.Setup(service => service.GetWeather(It.IsAny<string>())).ReturnsAsync(new CityWeatherView());
         this.ConfigurationMock.Setup(s => s["WeatherApi:DelayInSeconds"]).Returns("15");
-        var classUnderTest = new CitiesWeatherHostedService(AuthenticationServiceMock.Object,
+        var classUnderTest = new CitiesWeatherHostedService(loggerFactoryMock.Object,
+                                                            AuthenticationServiceMock.Object,
                                                             CitiesWeatherServiceMock.Object,
                                                             ValidatorMock.Object,
                                                             ConfigurationMock.Object,
@@ -47,7 +48,8 @@ public class CitiesWeatherHostedServiceTest : BaseTests
         // Arrange
         this.CitiesWeatherServiceMock.Setup(service => service.GetWeather(It.IsAny<string>())).ReturnsAsync((CityWeatherView?)null);
         this.ConfigurationMock.Setup(s => s["WeatherApi:DelayInSeconds"]).Returns("15");
-        var classUnderTest = new CitiesWeatherHostedService(AuthenticationServiceMock.Object,
+        var classUnderTest = new CitiesWeatherHostedService(loggerFactoryMock.Object,
+                                                            AuthenticationServiceMock.Object,
                                                             CitiesWeatherServiceMock.Object,
                                                             ValidatorMock.Object,
                                                             ConfigurationMock.Object,
