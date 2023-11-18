@@ -7,7 +7,7 @@ using Isun.Services;
 using Isun.Shared;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using Serilog;
+using Microsoft.Extensions.Logging;
 
 namespace Isun;
 public class CitiesWeatherHostedService : IHostedService, IDisposable
@@ -15,6 +15,7 @@ public class CitiesWeatherHostedService : IHostedService, IDisposable
     private readonly int refreshTimeInSeconds = 15;
     private static string token = string.Empty;
     private int executionCount = 0;
+    private readonly ILogger logger;
     private readonly IAuthenticationService authentication;
     private readonly ICitiesWeatherService citiesWeatherService;
     private readonly IValidator<ArgsValidator> validator;
@@ -24,20 +25,20 @@ public class CitiesWeatherHostedService : IHostedService, IDisposable
 
     private Timer? _timer = null;
 
-    public CitiesWeatherHostedService(IAuthenticationService authentication,
+    public CitiesWeatherHostedService(ILoggerFactory loggerFactory,
+                                      IAuthenticationService authentication,
                                       ICitiesWeatherService citiesWeatherService,
                                       IValidator<ArgsValidator> validator,
                                       IConfiguration configuration,
                                       ApplicationDbContext context)
     {
+        this.logger = loggerFactory.CreateLogger(nameof(CitiesWeatherHostedService));
         this.authentication = authentication;
         this.citiesWeatherService = citiesWeatherService;
         this.validator = validator;
         this.configuration = configuration;
         this.context = context;
-#pragma warning disable CS8604
-        this.refreshTimeInSeconds = int.Parse(configuration["WeatherApi:DelayInSeconds"]);
-#pragma warning restore CS8604
+        this.refreshTimeInSeconds = int.Parse(configuration["WeatherApi:DelayInSeconds"]!);
     }
 
     public void InitTest(List<string> citiesToUse)
@@ -47,13 +48,11 @@ public class CitiesWeatherHostedService : IHostedService, IDisposable
 
     public async Task StartAsync(CancellationToken stoppingToken)
     {
-        Log.Information("Method: {@Method}. Timed Hosted Service started.", nameof(StartAsync));
+        logger.LogInformation("Method: {@Method}. Timed Hosted Service started.", nameof(StartAsync));
         Console.WriteLine($"Cities weather hosted service started.");
 
-        var userName = configuration["WeatherApi:UserName"];
-#pragma warning disable CS8604
+        var userName = configuration["WeatherApi:UserName"]!;
         token = await authentication.GetBearerToken(userName, ArgsManager.Instance.Password);
-#pragma warning restore CS8604
         this.citiesWeatherService.Init(token);
 
         if (!await ValidateCities())
@@ -95,7 +94,7 @@ public class CitiesWeatherHostedService : IHostedService, IDisposable
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine($"City {city} is not supported and will be skipped");
                 Console.ResetColor();
-                Log.Warning("City {@City} is not supported and will be skipped", city);
+                logger.LogWarning("City {@City} is not supported and will be skipped", city);
             }
         }
 
@@ -126,7 +125,7 @@ public class CitiesWeatherHostedService : IHostedService, IDisposable
                 else
                 {
                     Console.WriteLine($"City {city} is not supported");
-                    Log.Warning("City {@City} is not supported", city);
+                    logger.LogWarning("City {@City} is not supported", city);
                 }
             }
 
@@ -145,7 +144,7 @@ public class CitiesWeatherHostedService : IHostedService, IDisposable
         }
         catch (Exception e)
         {
-            Log.Error(e, "Method: {@Method}", nameof(GetCitiesWeather));
+            logger.LogError(e, "Method: {@Method}", nameof(GetCitiesWeather));
             throw;
         }
     }
@@ -153,7 +152,7 @@ public class CitiesWeatherHostedService : IHostedService, IDisposable
     public Task StopAsync(CancellationToken stoppingToken)
     {
 
-        Log.Information("Method: {@Method}. Timed Hosted Service stopped.", nameof(StopAsync));
+        logger.LogInformation("Method: {@Method}. Timed Hosted Service stopped.", nameof(StopAsync));
 
         _timer?.Change(Timeout.Infinite, 0);
 

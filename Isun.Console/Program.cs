@@ -58,7 +58,6 @@ internal partial class Program
 
     static IHostBuilder ConfigureHost()
     {
-
             string environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production";
 
             IConfigurationRoot configuration = BuildInitConfiguration(environment);
@@ -75,37 +74,31 @@ internal partial class Program
                         })
                         .ConfigureServices((context, services) =>
                         {
+                            services.AddDbContext<ApplicationDbContext>(options => options.UseInMemoryDatabase(databaseName: "IsunInMemoryDatabase") );
                             services.AddSingleton(configuration);
                             services.AddSingleton<ILoggerFactory, LoggerFactory>();
                             services.AddFluentValidationClientsideAdapters();
                             services.AddValidatorsFromAssemblyContaining<ArgsValidator>();
-                        })
-                        .ConfigureServices((context, services) => 
-                        { 
-                            services.AddDbContext<ApplicationDbContext>(options => options.UseInMemoryDatabase(databaseName: "IsunInMemoryDatabase") );
-                        })
-#pragma warning disable CS8604
-#pragma warning disable CS8600
-                        .ConfigureServices((context, services) =>
-                        {
                             services.AddScoped<IAuthenticationService, AuthenticationService>();
                             services.AddScoped<ICitiesWeatherService, CitiesService>();
                             services.AddSingleton<CitiesWeatherHostedService>();
                             services.AddHttpClient(Constants.HttpClientForAuthentication, c =>
                             {
-                                c.BaseAddress = new Uri(configuration["WeatherApi:BaseUrl"]);
+                                c.BaseAddress = new Uri(configuration["WeatherApi:BaseUrl"]!);
                                 c.DefaultRequestHeaders.Add("Accept", "application/json");
                             }).AddTransientHttpErrorPolicy(s => s.WaitAndRetryAsync(3, times => TimeSpan.FromSeconds(times * 1)));
                             services.AddHttpClient(Constants.HttpClientForCityWeather, c =>
                             {
-                                c.BaseAddress = new Uri(configuration["WeatherApi:BaseUrl"]);
+                                c.BaseAddress = new Uri(configuration["WeatherApi:BaseUrl"]!);
                                 c.DefaultRequestHeaders.Add("Accept", "application/json");
                             }).AddTransientHttpErrorPolicy(s => s.WaitAndRetryAsync(3, times => TimeSpan.FromSeconds(times * 1)));
 
-                            services.AddSingleton<IHostedService, CitiesWeatherHostedService>();
+                            services.AddSingleton<IHostedService, CitiesWeatherHostedService>()
+                                    .AddLogging(builder => 
+                                    {
+                                        builder.AddSerilog(Log.Logger);
+                                    });
                         });
-#pragma warning restore CS8604
-#pragma warning restore CS8600
     }
 
     private static IConfigurationRoot BuildInitConfiguration(string environment)

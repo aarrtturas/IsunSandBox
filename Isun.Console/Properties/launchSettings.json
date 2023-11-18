@@ -2,7 +2,10 @@
   "profiles": {
     "Isun": {
       "commandName": "Project",
-      "commandLineArgs": "-p passwrod -c \"Vilnius, Kaunas, Joniškis, Klaipėda\""
+      "commandLineArgs": "-p passwrod -c \"Vilnius, Kaunas, Joniškis, Klaipėda\"",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT ": "Development"
+      }
     }
   }
 }
