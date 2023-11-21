@@ -33,6 +33,5 @@ public abstract class BaseTests : IDisposable
     {
         this.ContextMock.Object.Dispose();
         this.loggerFactoryMock.Object.Dispose();
-        this.loggerFactoryMock.Object.Dispose();
     }
 }

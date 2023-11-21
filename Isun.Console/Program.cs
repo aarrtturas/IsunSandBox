@@ -22,33 +22,33 @@ internal partial class Program
         {
             ShowInfo();
 
-        if (args.Length == 0)
-        {
-            ShowHelp(null);
-            return;
-        }
-
-        bool next = GetParsedArgs(args);
-
-        if (next)
-        { 
-            var host = ConfigureHost().Build();
-            using (var scope = host.Services.CreateScope())
+            if (args.Length == 0)
             {
-                var services = scope.ServiceProvider;
-                var myService = services.GetRequiredService<IHostedService>();
-                Console.WriteLine("Press any key to exit.");
-                Console.WriteLine();
-                await host.StartAsync();
-                Console.ReadKey();
-                await host.StopAsync();
+                ShowHelp(null);
+                return;
             }
-        }
+
+            bool next = GetParsedArgs(args);
+
+            if (next)
+            { 
+                var host = ConfigureHost().Build();
+                using (var scope = host.Services.CreateScope())
+                {
+                    var services = scope.ServiceProvider;
+                    var myService = services.GetRequiredService<IHostedService>();
+                    Console.WriteLine("Press any key to exit.");
+                    Console.WriteLine();
+                    await host.StartAsync();
+                    Console.ReadKey();
+                    await host.StopAsync();
+                }
+            }
         }
         catch (Exception e)
         {
             Console.WriteLine($"An error occurred: {e.Message}");
-            Log.Error(e, "Application fielded to start. Method: {@Method}", nameof(Main));
+            Log.Error(e, "Application failed to start. Method: {@Method}", nameof(Main));
         }
         finally
         {

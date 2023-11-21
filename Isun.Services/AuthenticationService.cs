@@ -1,5 +1,6 @@
 ﻿using Isun.Domain.View;
 using Isun.Shared;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using System.Net.Http.Json;
 
@@ -42,7 +43,7 @@ public sealed class AuthenticationService : IAuthenticationService
         }
         catch (Exception e)
         {
-            this.logger.LogError(e, "Method: {@Method}. Http status code is not success:: {@StatusCode}", nameof(GetBearerToken));
+            this.logger.LogError(e, "Method: {@Method}. Http status code is not success.", nameof(GetBearerToken));
             throw;
         }
     }

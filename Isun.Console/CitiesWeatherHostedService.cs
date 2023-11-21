@@ -81,8 +81,8 @@ public class CitiesWeatherHostedService : IHostedService, IDisposable
         }
 
         string[] citiesProvidedArray = ArgsManager.Instance.Cities.Trim()
-                                                                   .Replace(", ", ",")
-                                                                   .Split(',');
+                                                                  .Replace(", ", ",")
+                                                                  .Split(',');
 
         var citiesExisting = await this.citiesWeatherService.GetCities();
         foreach (var city in citiesProvidedArray)

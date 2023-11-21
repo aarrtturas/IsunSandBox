@@ -6,7 +6,7 @@ public class ApplicationDbContext : DbContext
 {
     public ApplicationDbContext(DbContextOptions options) : base(options) { }
 
-    public DbSet<CityWeatherDao> CityWeathers { get; set; } = null!;
+    public DbSet<CityWeatherDao> CityWeathers { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
