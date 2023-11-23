@@ -15,6 +15,7 @@
   </ItemGroup>
   
   <ItemGroup>
+    <ProjectReference Include="..\Isun.AppContext\Isun.ApplicationContext.csproj" />
     <ProjectReference Include="..\Isun.Domain\Isun.Domain.csproj" />
     <ProjectReference Include="..\Isun.Shared\Isun.Shared.csproj" />
   </ItemGroup>

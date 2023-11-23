@@ -20,7 +20,7 @@ public class CitiesWeatherHostedService : IHostedService, IDisposable
     private readonly ICitiesWeatherService citiesWeatherService;
     private readonly IValidator<ArgsValidator> validator;
     private readonly IConfiguration configuration;
-    private readonly ApplicationDbContext context;
+    private readonly ICitiesRepository citiesRepository;
     private List<string> citiesToUse = new();
 
     private Timer? _timer = null;
@@ -30,14 +30,14 @@ public class CitiesWeatherHostedService : IHostedService, IDisposable
                                       ICitiesWeatherService citiesWeatherService,
                                       IValidator<ArgsValidator> validator,
                                       IConfiguration configuration,
-                                      ApplicationDbContext context)
+                                      ICitiesRepository citiesRepository)
     {
         this.logger = loggerFactory.CreateLogger(nameof(CitiesWeatherHostedService));
         this.authentication = authentication;
         this.citiesWeatherService = citiesWeatherService;
         this.validator = validator;
         this.configuration = configuration;
-        this.context = context;
+        this.citiesRepository = citiesRepository;
         this.refreshTimeInSeconds = int.Parse(configuration["WeatherApi:DelayInSeconds"]!);
     }
 
@@ -64,7 +64,7 @@ public class CitiesWeatherHostedService : IHostedService, IDisposable
             return;
         }
 
-        _timer = new Timer(DoWork, null, TimeSpan.Zero, TimeSpan.FromSeconds(refreshTimeInSeconds));
+        _timer = new Timer(async o => { await DoWork(o); }, null, TimeSpan.Zero, TimeSpan.FromSeconds(refreshTimeInSeconds));
     }
 
     private async Task<bool> ValidateCities()
@@ -92,21 +92,19 @@ public class CitiesWeatherHostedService : IHostedService, IDisposable
             else
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"City {city} is not supported and will be skipped");
-                Console.ResetColor();
                 logger.LogWarning("City {@City} is not supported and will be skipped", city);
+                Console.ResetColor();
             }
         }
 
         return true;
     }
 
-    private void DoWork(object? state)
+    private async Task DoWork(object? state)
     {
         var count = Interlocked.Increment(ref executionCount);
 
-        var t1 = Task.Run(() => GetCitiesWeather());
-        Task.WaitAll(t1);
+        await GetCitiesWeather();
 
         Console.WriteLine($"Cities weather hosted service is working. Count: {count}. Delay {refreshTimeInSeconds}");
     }
@@ -139,8 +137,7 @@ public class CitiesWeatherHostedService : IHostedService, IDisposable
             if (items.Count == 0)
                 return;
 
-            context.AddRange(items);
-            context.SaveChanges();
+            await citiesRepository.AddRange(items);
         }
         catch (Exception e)
         {
