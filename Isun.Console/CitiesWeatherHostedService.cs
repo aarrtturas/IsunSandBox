@@ -57,9 +57,7 @@ public class CitiesWeatherHostedService : IHostedService, IDisposable
 
         if (!await ValidateCities())
         {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine($"Cities weather hosted service is exiting. Bad inputs.");
-            Console.ResetColor();
+            ConsoleWriteRed("Cities weather hosted service is exiting. Bad inputs.");
             await StopAsync(default);
             return;
         }
@@ -74,9 +72,7 @@ public class CitiesWeatherHostedService : IHostedService, IDisposable
         if (!result.IsValid)
         {
 
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine($"Cities {ArgsManager.Instance.Cities} are not valid. Error: {result.Errors[0].ErrorMessage}");
-            Console.ResetColor();
+            ConsoleWriteRed($"Cities {ArgsManager.Instance.Cities} are not valid. Error: {result.Errors[0].ErrorMessage}");
             return false;
         }
 
@@ -90,11 +86,7 @@ public class CitiesWeatherHostedService : IHostedService, IDisposable
             if (citiesExisting.Contains(city))
                 citiesToUse.Add(city);
             else
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                logger.LogWarning("City {@City} is not supported and will be skipped", city);
-                Console.ResetColor();
-            }
+                ConsoleWriteRed($"City {city} is not supported");
         }
 
         return true;
@@ -129,9 +121,7 @@ public class CitiesWeatherHostedService : IHostedService, IDisposable
 
             foreach (var item in items)
             {
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine($"City: {item.City} Temperature: {item.Temperature} Precipitation: {item.Precipitation} WindSpeed: {item.WindSpeed} Summary: {item.Summary}");
-                Console.ResetColor();
+                ConsoleWriteGreen($"City: {item.City} Temperature: {item.Temperature} Precipitation: {item.Precipitation} WindSpeed: {item.WindSpeed} Summary: {item.Summary}");
             }
 
             if (items.Count == 0)
@@ -159,5 +149,19 @@ public class CitiesWeatherHostedService : IHostedService, IDisposable
     public void Dispose()
     {
         _timer?.Dispose();
+    }
+
+    private void ConsoleWriteRed(string content)
+    {
+        Console.ForegroundColor = ConsoleColor.Red;
+        Console.WriteLine(content);
+        Console.ResetColor();
+    }
+
+    private void ConsoleWriteGreen(string content)
+    {
+        Console.ForegroundColor = ConsoleColor.Green;
+        Console.WriteLine(content);
+        Console.ResetColor();
     }
 }
