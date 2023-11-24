@@ -1,5 +1,5 @@
 ﻿namespace Isun.Shared;
-public class ArgsManager
+public sealed class ArgsManager
 {
 #pragma warning disable CS8618
     private static ArgsManager _instance;

@@ -11,10 +11,12 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NDesk.Options;
 using Polly;
+using Polly.Retry;
 using Serilog;
+using System.Net.Http.Headers;
 
 namespace Isun;
-internal partial class Program
+public partial class Program
 {
     private async static Task Main(string[] args)
     {
@@ -31,7 +33,7 @@ internal partial class Program
             bool next = GetParsedArgs(args);
 
             if (next)
-            { 
+            {
                 var host = ConfigureHost().Build();
                 using (var scope = host.Services.CreateScope())
                 {
@@ -58,48 +60,62 @@ internal partial class Program
 
     static IHostBuilder ConfigureHost()
     {
-            string environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production";
+        string environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production";
 
-            IConfigurationRoot configuration = BuildInitConfiguration(environment);
+        IConfigurationRoot configuration = BuildInitConfiguration(environment);
 
-            Log.Logger = new LoggerConfiguration().ReadFrom.Configuration(configuration).CreateLogger();
-            Log.Information("Application started. Method: {@Method}", nameof(Main));
+        Log.Logger = new LoggerConfiguration().ReadFrom.Configuration(configuration).CreateLogger();
+        Log.Information("Application started. Method: {@Method}", nameof(Main));
 
-            return Host.CreateDefaultBuilder()
-                        .UseSerilog()
-                        .ConfigureLogging((hostingContext, logging) =>
+        return Host.CreateDefaultBuilder()
+                    .UseSerilog()
+                    .ConfigureLogging((hostingContext, logging) =>
+                    {
+                        logging.ClearProviders();
+                        logging.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Information);
+                    })
+                    .ConfigureServices((context, services) =>
+                    {
+                        services.AddDbContext<ApplicationDbContext>(options => options.UseInMemoryDatabase(databaseName: "IsunInMemoryDatabase"));
+                        services.AddSingleton(configuration);
+                        services.AddSingleton<ILoggerFactory, LoggerFactory>();
+                        services.AddFluentValidationClientsideAdapters();
+                        services.AddValidatorsFromAssemblyContaining<ArgsValidator>();
+                        services.AddScoped<ICitiesRepository, CitiesRepository>();
+                        services.AddScoped<IAuthenticationService, AuthenticationService>();
+                        services.AddScoped<ICitiesWeatherService, CitiesService>();
+                        services.AddSingleton<CitiesWeatherHostedService>();
+                        services.AddHttpClient(Constants.HttpClientForAuthentication, c =>
                         {
-                            logging.ClearProviders();
-                            logging.SetMinimumLevel(LogLevel.Information);
-                        })
-                        .ConfigureServices((context, services) =>
+                            c.BaseAddress = new Uri(configuration["WeatherApi:BaseUrl"]!);
+                            c.DefaultRequestHeaders.Add("Accept", "application/json");
+                        }).AddTransientHttpErrorPolicy(s => s.WaitAndRetryAsync(3, times => TimeSpan.FromSeconds(times * 1)));
+                        services.AddHttpClient(Constants.HttpClientForCityWeather, c =>
                         {
-                            services.AddDbContext<ApplicationDbContext>(options => options.UseInMemoryDatabase(databaseName: "IsunInMemoryDatabase") );
-                            services.AddSingleton(configuration);
-                            services.AddSingleton<ILoggerFactory, LoggerFactory>();
-                            services.AddFluentValidationClientsideAdapters();
-                            services.AddValidatorsFromAssemblyContaining<ArgsValidator>();
-                            services.AddScoped<IAuthenticationService, AuthenticationService>();
-                            services.AddScoped<ICitiesWeatherService, CitiesService>();
-                            services.AddSingleton<CitiesWeatherHostedService>();
-                            services.AddHttpClient(Constants.HttpClientForAuthentication, c =>
-                            {
-                                c.BaseAddress = new Uri(configuration["WeatherApi:BaseUrl"]!);
-                                c.DefaultRequestHeaders.Add("Accept", "application/json");
-                            }).AddTransientHttpErrorPolicy(s => s.WaitAndRetryAsync(3, times => TimeSpan.FromSeconds(times * 1)));
-                            services.AddHttpClient(Constants.HttpClientForCityWeather, c =>
-                            {
-                                c.BaseAddress = new Uri(configuration["WeatherApi:BaseUrl"]!);
-                                c.DefaultRequestHeaders.Add("Accept", "application/json");
-                            }).AddTransientHttpErrorPolicy(s => s.WaitAndRetryAsync(3, times => TimeSpan.FromSeconds(times * 1)));
-                            services.AddSingleton<IAppHttpClient, AppHttpClient>();
+                            c.BaseAddress = new Uri(configuration["WeatherApi:BaseUrl"]!);
+                            c.DefaultRequestHeaders.Add("Accept", "application/json");
+                        }).AddTransientHttpErrorPolicy(s => s.WaitAndRetryAsync(3, times => TimeSpan.FromSeconds(times * 1)))
+                          .AddPolicyHandler((provider, _) => GetRetryPolicyForUnauthorized(configuration, provider));
+                        services.AddSingleton<IHostedService, CitiesWeatherHostedService>()
+                                .AddLogging(builder =>
+                                {
+                                    builder.AddSerilog(Log.Logger);
+                                });
+                    });
+    }
 
-                            services.AddSingleton<IHostedService, CitiesWeatherHostedService>()
-                                    .AddLogging(builder => 
-                                    {
-                                        builder.AddSerilog(Log.Logger);
-                                    });
-                        });
+    public static AsyncRetryPolicy<HttpResponseMessage> GetRetryPolicyForUnauthorized(IConfiguration configuration, IServiceProvider provider)
+    {
+        return Policy
+            .HandleResult<HttpResponseMessage>(r => r.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            .RetryAsync(3, async (result, retryCount) =>
+            {
+                string userName = configuration["WeatherApi:UserName"]!;
+                var authenticationService = provider.GetRequiredService<IAuthenticationService>();
+                var newToken = await authenticationService.GetBearerToken(userName, ArgsManager.Instance.Password);
+                TokenManager.Instance.Token = newToken;
+                result.Result.RequestMessage!.Headers.Authorization = new AuthenticationHeaderValue("Bearer", newToken);
+            });
     }
 
     private static IConfigurationRoot BuildInitConfiguration(string environment)
@@ -113,7 +129,7 @@ internal partial class Program
             .Build();
     }
 
-    public static bool GetParsedArgs(string[] args)
+    private static bool GetParsedArgs(string[] args)
     {
         bool showHelp = false;
         string passwordForApi = string.Empty;

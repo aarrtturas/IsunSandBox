@@ -3,11 +3,12 @@ using Isun.Shared;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.Net.Http.Headers;
+using System.Net.Http.Json;
 
 namespace Isun.Services;
 public interface ICitiesWeatherService
 {
-    void Init(string token);
+    void Init();
 
     Task<string[]> GetCities();
 
@@ -19,29 +20,27 @@ public sealed class CitiesService : ICitiesWeatherService
     private readonly ILogger logger;
     private HttpClient httpClient;
     private readonly IConfiguration configuration;
-    private readonly IAppHttpClient appHttpClient;
 
     public CitiesService(ILoggerFactory loggerFactory,
                          IConfiguration configuration,
-                         IHttpClientFactory clientFactory,
-                         IAppHttpClient appHttpClient)
+                         IHttpClientFactory clientFactory)
     {
         this.logger = loggerFactory.CreateLogger(nameof(CitiesService));
         this.httpClient = clientFactory.CreateClient(Constants.HttpClientForCityWeather);
         this.configuration = configuration;
-        this.appHttpClient = appHttpClient;
     }
 
-    public void Init(string token)
+    public void Init()
     {
-        this.httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        this.httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TokenManager.Instance.Token);
     }
 
     public async Task<CityWeatherView?> GetWeather(string city)
     {
         try
         {
-            var result = await this.appHttpClient.GetAsync<CityWeatherView>(this.httpClient, $"api/weather/{city}");
+            Init();
+            var result = await this.httpClient.GetFromJsonAsync<CityWeatherView>($"api/weathers/{city}");
             return result;
         }
         catch (Exception e)
@@ -55,7 +54,8 @@ public sealed class CitiesService : ICitiesWeatherService
     {
         try
         {
-            var result = await this.appHttpClient.GetAsync<string[]>(this.httpClient, $"api/cities");
+            Init();
+            var result = await this.httpClient.GetFromJsonAsync<string[]>($"api/cities");
             return result is null ? Array.Empty<string>() : result;
         }
         catch (Exception e)

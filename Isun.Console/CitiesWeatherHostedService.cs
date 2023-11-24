@@ -53,7 +53,7 @@ public class CitiesWeatherHostedService : IHostedService, IDisposable
 
         var userName = configuration["WeatherApi:UserName"]!;
         token = await authentication.GetBearerToken(userName, ArgsManager.Instance.Password);
-        this.citiesWeatherService.Init(token);
+        TokenManager.Instance.Token = token;
 
         if (!await ValidateCities())
         {
