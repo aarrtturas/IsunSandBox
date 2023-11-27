@@ -49,7 +49,6 @@ public class CitiesWeatherHostedService : IHostedService, IDisposable
     public async Task StartAsync(CancellationToken stoppingToken)
     {
         logger.LogInformation("Method: {@Method}. Timed Hosted Service started.", nameof(StartAsync));
-        Console.WriteLine($"Cities weather hosted service started.");
 
         var userName = configuration["WeatherApi:UserName"]!;
         token = await authentication.GetBearerToken(userName, ArgsManager.Instance.Password);

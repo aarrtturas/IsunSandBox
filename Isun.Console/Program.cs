@@ -22,6 +22,7 @@ public partial class Program
     {
         try
         {
+            Console.OutputEncoding = System.Text.Encoding.Unicode;
             ShowInfo();
 
             if (args.Length == 0)
@@ -138,7 +139,7 @@ public partial class Program
         var p = new OptionSet()
         {
             { "p|password=", "the {PASSWORD} for weather api", v => passwordForApi = v },
-            { "c|cities=", "the {CITIES} to get weather: \"Vilnius, Kaunas\" ", v => cities = v },
+            { "c|cities=", "the {CITIES} to get weather: \"Vilnius, Kaunas, Klaipėda\" ", v => cities = v },
             { "h|help",  "show this message and exit", v => showHelp = v != null },
         };
 

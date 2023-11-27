@@ -2,7 +2,7 @@
   "profiles": {
     "Isun": {
       "commandName": "Project",
-      "commandLineArgs": "-p passwrod -c \"Vilnius\"",
+      "commandLineArgs": "-p pass -c \"Vilnius\"",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT ": "Development"
       }
