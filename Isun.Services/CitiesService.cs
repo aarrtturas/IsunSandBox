@@ -8,8 +8,6 @@ using System.Net.Http.Json;
 namespace Isun.Services;
 public interface ICitiesWeatherService
 {
-    void Init();
-
     Task<string[]> GetCities();
 
     Task<CityWeatherView?> GetWeather(string city);
@@ -30,17 +28,11 @@ public sealed class CitiesService : ICitiesWeatherService
         this.configuration = configuration;
     }
 
-    public void Init()
-    {
-        this.httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TokenManager.Instance.Token);
-    }
-
     public async Task<CityWeatherView?> GetWeather(string city)
     {
         try
         {
-            Init();
-            var result = await this.httpClient.GetFromJsonAsync<CityWeatherView>($"api/weathers/{city}");
+            var result = await this.httpClient.GetFromJsonAsync<CityWeatherView>($"api/weathers/get/{city}");
             return result;
         }
         catch (Exception e)
@@ -54,8 +46,7 @@ public sealed class CitiesService : ICitiesWeatherService
     {
         try
         {
-            Init();
-            var result = await this.httpClient.GetFromJsonAsync<string[]>($"api/cities");
+            var result = await this.httpClient.GetFromJsonAsync<string[]>($"api/cities/get");
             return result is null ? Array.Empty<string>() : result;
         }
         catch (Exception e)

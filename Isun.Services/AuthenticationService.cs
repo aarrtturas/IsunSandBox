@@ -25,18 +25,18 @@ public sealed class AuthenticationService : IAuthenticationService
     {
         try
         {
-            var httpResponse = await this.httpClient.PostAsJsonAsync("api/authorize", new AuthorizationRequestView(userName, password));
+            var httpResponse = await this.httpClient.PostAsJsonAsync("api/authenticate/Json", new AuthorizationRequestView(userName, password));
             if (httpResponse.IsSuccessStatusCode)
             {
                 var result = await httpResponse.Content.ReadFromJsonAsync<AuthorizationResponseView>();
 
-                if (result is null || string.IsNullOrEmpty(result.token))
+                if (result is null || string.IsNullOrEmpty(result.Token))
                 {
                     this.logger.LogError("Method: {@Method}. Token is null or empty. UserName: {@UserName}. Password: {@Password}", nameof(GetBearerToken), userName, password);
                     throw new ApplicationException($"Method: {nameof(GetBearerToken)}. Token is null or empty");
                 }
 
-                return result.token;
+                return result.Token;
             }
 
             throw new HttpRequestException($"Method: {nameof(GetBearerToken)}. Http status code is not success: {httpResponse.StatusCode}");

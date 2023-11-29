@@ -1,4 +1,4 @@
 ﻿namespace Isun.Domain.View;
-public record AuthorizationRequestView(string username, string password);
+public record AuthorizationRequestView(string Username, string Password);
 
-public record AuthorizationResponseView(string token);
+public record AuthorizationResponseView(string Token);

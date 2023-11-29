@@ -10,9 +10,9 @@ Some settings:
 ```json
 {
   "WeatherApi": {
-    "BaseUrl": "https://weather-api.isun.ch/",
-    "UserName": "isun",
-    "DelayInSeconds":  15
+    "BaseUrl": "http://158.220.97.168:86/",
+    "UserName": "testing",
+    "DelayInSeconds": 120
   }
 }
 ```
