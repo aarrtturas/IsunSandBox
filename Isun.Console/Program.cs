@@ -97,8 +97,8 @@ public partial class Program
                             c.BaseAddress = new Uri(configuration["WeatherApi:BaseUrl"]!);
                             c.DefaultRequestHeaders.Add("Accept", "application/json");
                         }).AddTransientHttpErrorPolicy(s => s.WaitAndRetryAsync(3, times => TimeSpan.FromSeconds(times * 1)))
-                          .AddPolicyHandler((provider, _) => GetRetryPolicyForUnauthorized(configuration, provider))
-                          .AddHttpMessageHandler<AuthenticatedHttpClientHandler>(); 
+                          .AddHttpMessageHandler<AuthenticatedHttpClientHandler>()
+                          .AddPolicyHandler((provider, _) => GetRetryPolicyForUnauthorized(configuration, provider));
                         services.AddSingleton<IHostedService, CitiesWeatherHostedService>()
                                 .AddLogging(builder =>
                                 {
